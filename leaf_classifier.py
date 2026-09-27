@@ -9,9 +9,7 @@ from tensorflow.keras import layers, models
 from tensorflow.keras.applications import MobileNetV2
 from sklearn.metrics import classification_report, confusion_matrix
 
-# ==========================================
 # 1. LOAD AND PREPROCESS DATA
-# ==========================================
 def load_and_preprocess_data(dataset_path, img_size=224):
     X, y, file_paths = [], [], []
     categories = ['healthy', 'disease']
@@ -43,9 +41,7 @@ def load_and_preprocess_data(dataset_path, img_size=224):
 
 X, y, file_paths = load_and_preprocess_data(".", img_size=224)
 
-# ==========================================
 # 2. BALANCED TRAIN/TEST SPLIT
-# ==========================================
 healthy_idx = np.where(y == 0)[0]
 disease_idx = np.where(y == 1)[0]
 
@@ -58,9 +54,7 @@ paths_test = np.concatenate([file_paths[healthy_idx[-test_count:]], file_paths[d
 X_train = np.concatenate([X[healthy_idx[:-test_count]], X[disease_idx[:-test_count]]], axis=0)
 y_train = np.concatenate([y[healthy_idx[:-test_count]], y[disease_idx[:-test_count]]], axis=0)
 
-# ==========================================
 # 3. TRANSFER LEARNING MODEL
-# ==========================================
 data_augmentation = tf.keras.Sequential([
     layers.RandomFlip("horizontal_and_vertical"),
     layers.RandomRotation(0.2),
@@ -87,9 +81,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
 print("\nTraining Transfer Learning Model...")
 history = model.fit(X_train, y_train, epochs=15, batch_size=8, validation_data=(X_test, y_test))
 
-# ==========================================
 # 4. TRAINING PROGRESS GRAPH
-# ==========================================
 print("\nGenerating Accuracy & Loss Plots..."),
 epochs_range = range(1, 16)
 plt.figure(figsize=(10, 4))
@@ -115,9 +107,7 @@ plt.grid(True, linestyle='--', alpha=0.6)
 plt.tight_layout()
 plt.show()
 
-# ==========================================
 # 5. CONFUSION MATRIX & EVALUATION REPORT
-# ==========================================
 y_pred_probs = model.predict(X_test)
 y_pred = np.argmax(y_pred_probs, axis=1)
 
@@ -136,9 +126,7 @@ plt.xlabel('Predicted Class')
 plt.tight_layout()
 plt.show()
 
-# ==========================================
 # 6. TERMINAL PREDICTION OUTPUT
-# ==========================================
 categories = ['Healthy', 'Disease']
 random_idx = np.random.randint(0, len(X_test))
 
@@ -148,16 +136,13 @@ predicted_label = categories[y_pred[random_idx]]
 confidence = y_pred_probs[random_idx][y_pred[random_idx]] * 100
 is_correct = "PASS" if actual_label == predicted_label else "FAIL"
 
-print("\n==============================================")
 print("       RANDOM LEAF PREDICTION RESULT          ")
-print("==============================================")
+
 print(f" Image Filename : {sample_name}")
 print(f" Actual Class   : {actual_label}")
 print(f" Predicted Class: {predicted_label}")
 print(f" Confidence     : {confidence:.2f}%")
 print(f" Match Result   : [{is_correct}]")
-print("==============================================\n")
-# Add this at the bottom of leaf_classifier.py
+
 model.save("plant_model.keras")
 print("✅ Model successfully saved as plant_model.keras!")
-# =====================================================================
